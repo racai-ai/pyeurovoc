@@ -7,6 +7,7 @@ from skmultilearn.model_selection import IterativeStratification
 from sklearn.preprocessing import MultiLabelBinarizer
 import torch
 import numpy as np
+import pickle
 
 
 def process_document(path, tokenizer, max_len=512):
@@ -107,7 +108,7 @@ def process_datasets(data_path, directory, tokenizer_name):
                                                                             dev_X.shape[0],
                                                                             test_X.shape[0]))
 
-    return train_X, train_mask, train_y, dev_X, dev_mask, dev_y, test_X, test_mask, test_y
+    return train_X, train_mask, train_y, dev_X, dev_mask, dev_y, test_X, test_mask, test_y, mlb
 
 
 def preprocess_data():
@@ -123,7 +124,8 @@ def preprocess_data():
 
         train_X, train_mask, train_y, \
         dev_X, dev_mask, dev_y, \
-        test_X, test_mask, test_y = process_datasets(args.data_path, directory, config[lang])
+        test_X, test_mask, test_y, \
+        mlb = process_datasets(args.data_path, directory, config[lang])
 
         np.save(os.path.join(args.data_path, directory, "train_X.npy"), train_X)
         np.save(os.path.join(args.data_path, directory, "train_mask.npy"), train_mask)
@@ -136,6 +138,9 @@ def preprocess_data():
         np.save(os.path.join(args.data_path, directory, "test_X.npy"), test_X)
         np.save(os.path.join(args.data_path, directory, "test_mask.npy"), test_mask)
         np.save(os.path.join(args.data_path, directory, "test_y.npy"), test_y)
+
+        with open(os.path.join(args.data_path, directory, "encoder.pickle", "wb")) as pickle_fp:
+            pickle.dump(pickle_fp, mlb, pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == "__main__":
