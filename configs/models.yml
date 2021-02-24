@@ -1,0 +1,22 @@
+bg:
+cs:
+da: Maltehb/danish-bert-botxo
+de: bert-base-german-dbmdz-cased
+el: nlpaueb/bert-base-greek-uncased-v1
+en: bert-base-cased
+es: dccuchile/bert-base-spanish-wwm-cased
+et: tartuNLP/EstBERT
+fi: TurkuNLP/bert-base-finnish-cased-v1
+fr: flaubert/flaubert_base_cased
+hu: SZTAKI-HLT/hubert-base-cc
+it: dbmdz/bert-base-italian-cased
+lt:
+lv:
+mt:
+nl: wietsedv/bert-base-dutch-cased
+pl: dkleczek/bert-base-polish-cased-v1
+pt: neuralmind/bert-base-portuguese-cased
+ro: dumitrescustefan/bert-base-romanian-cased-v1
+sk:
+sl:
+sv: KB/bert-base-swedish-cased
