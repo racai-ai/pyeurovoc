@@ -2,6 +2,9 @@ import torch
 import numpy as np
 
 
+SEEDS = [110, 221, 332, 443, 554]
+
+
 def f1k_score(y_true, probs, k, eps=1e-10):
     true_labels = [torch.nonzero(labels, as_tuple=True)[0] for labels in y_true]
     pred_labels = torch.sort(probs, descending=True)[1][:, :k]

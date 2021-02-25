@@ -8,6 +8,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 import torch
 import numpy as np
 import pickle
+from utils import SEEDS
 
 
 def process_document(path, tokenizer, max_len=512):
@@ -67,6 +68,42 @@ def process_document(path, tokenizer, max_len=512):
     return list_inputs, list_masks, list_labels
 
 
+def save_splits(X, masks, y, directory):
+    for i, seed in enumerate(SEEDS):
+        stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.2, 0.8], random_state=seed)
+        train_idx, aux_idx = next(stratifier.split(X, y))
+        train_X, train_mask, train_y = X[train_idx, :], masks[train_idx, :], y[train_idx, :]
+
+        assert train_X.shape[0] == train_mask.shape[0] == train_y.shape[0]
+
+        stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.5, 0.5], random_state=seed)
+        dev_idx, test_idx = next(stratifier.split(X[aux_idx, :], y[aux_idx, :]))
+        dev_X, dev_mask, dev_y = X[dev_idx, :], masks[dev_idx, :], y[dev_idx, :]
+        test_X, test_mask, test_y = X[test_idx, :], masks[test_idx, :], y[test_idx, :]
+
+        assert dev_X.shape[0] == dev_mask.shape[0] == dev_y.shape[0]
+        assert test_X.shape[0] == test_mask.shape[0] == test_y.shape[0]
+
+        print("{} - Splitted the documents in - train: {}, dev: {}, test: {}".format(i, train_X.shape[0],
+                                                                                     dev_X.shape[0],
+                                                                                     test_X.shape[0]))
+
+        if not os.path.exists(os.path.join(args.data_path, directory, "split_{}".format(i))):
+            os.makedirs(os.path.join(args.data_path, directory, "split_{}".format(i)))
+
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "train_X.npy"), train_X)
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "train_mask.npy"), train_mask)
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "train_y.npy"), train_y)
+
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "dev_X.npy"), dev_X)
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "dev_mask.npy"), dev_mask)
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "dev_y.npy"), dev_y)
+
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "test_X.npy"), test_X)
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "test_mask.npy"), test_mask)
+        np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "test_y.npy"), test_y)
+
+
 def process_datasets(data_path, directory, tokenizer_name):
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
 
@@ -90,25 +127,10 @@ def process_datasets(data_path, directory, tokenizer_name):
     X = torch.nn.utils.rnn.pad_sequence(list_inputs, batch_first=True, padding_value=tokenizer.pad_token_id).numpy()
     masks = torch.nn.utils.rnn.pad_sequence(list_masks, batch_first=True, padding_value=0).numpy()
 
-    stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.2, 0.8])
-    train_idx, aux_idx = next(stratifier.split(list_inputs, y))
-    train_X, train_mask, train_y = X[train_idx, :], masks[train_idx, :], y[train_idx, :]
+    with open(os.path.join(args.data_path, directory, "mlb_encoder.pickle"), "wb") as pickle_fp:
+        pickle.dump(mlb, pickle_fp, protocol=pickle.HIGHEST_PROTOCOL)
 
-    assert train_X.shape[0] == train_mask.shape[0] == train_y.shape[0]
-
-    stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.5, 0.5])
-    dev_idx, test_idx = next(stratifier.split(X[aux_idx, :], y[aux_idx, :]))
-    dev_X, dev_mask, dev_y = X[dev_idx, :], masks[dev_idx, :], y[dev_idx, :]
-    test_X, test_mask, test_y = X[test_idx, :], masks[test_idx, :], y[test_idx, :]
-
-    assert dev_X.shape[0] == dev_mask.shape[0] == dev_y.shape[0]
-    assert test_X.shape[0] == test_mask.shape[0] == test_y.shape[0]
-
-    print("Splitted the documents in - train: {}, dev: {}, test: {}".format(train_X.shape[0],
-                                                                            dev_X.shape[0],
-                                                                            test_X.shape[0]))
-
-    return train_X, train_mask, train_y, dev_X, dev_mask, dev_y, test_X, test_mask, test_y, mlb
+    save_splits(X, masks, y, directory)
 
 
 def preprocess_data():
@@ -122,25 +144,7 @@ def preprocess_data():
         lang = directory[:2]
         print("Lang: '{}', Tokenizer: '{}'".format(lang, config[lang]))
 
-        train_X, train_mask, train_y, \
-        dev_X, dev_mask, dev_y, \
-        test_X, test_mask, test_y, \
-        mlb = process_datasets(args.data_path, directory, config[lang])
-
-        np.save(os.path.join(args.data_path, directory, "train_X.npy"), train_X)
-        np.save(os.path.join(args.data_path, directory, "train_mask.npy"), train_mask)
-        np.save(os.path.join(args.data_path, directory, "train_y.npy"), train_y)
-
-        np.save(os.path.join(args.data_path, directory, "dev_X.npy"), dev_X)
-        np.save(os.path.join(args.data_path, directory, "dev_mask.npy"), dev_mask)
-        np.save(os.path.join(args.data_path, directory, "dev_y.npy"), dev_y)
-
-        np.save(os.path.join(args.data_path, directory, "test_X.npy"), test_X)
-        np.save(os.path.join(args.data_path, directory, "test_mask.npy"), test_mask)
-        np.save(os.path.join(args.data_path, directory, "test_y.npy"), test_y)
-
-        with open(os.path.join(args.data_path, directory, "encoder.pickle", "wb")) as pickle_fp:
-            pickle.dump(pickle_fp, mlb, pickle.HIGHEST_PROTOCOL)
+        process_datasets(args.data_path, directory, config[lang])
 
 
 if __name__ == "__main__":

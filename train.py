@@ -75,24 +75,26 @@ def train():
         os.makedirs(args.save_path)
 
     print("Loading preprocessed datasets...")
-    dict_datasets = load_data(args.data_path, args.batch_size)
 
-    for lang, (train_loader, dev_loader, test_loader, num_classes) in dict_datasets.items():
-        print("\nTraining for language: '{}' using: '{}'...".format(lang, config[lang]))
+    for lang in config.keys():
+        datasets = load_data(args.data_path, lang, args.batch_size)
 
-        lang_model = AutoModel.from_pretrained(config[lang])
-        model = LangModelWithDense(lang_model, num_classes)
+        for split_idx, (train_loader, dev_loader, test_loader, num_classes) in enumerate(datasets):
+            print("\nTraining for language: '{}' using: '{}'...".format(lang, config[lang]))
 
-        optimizer = AdamW(model.parameters(), lr=3e-5)
+            lang_model = AutoModel.from_pretrained(config[lang])
+            model = LangModelWithDense(lang_model, num_classes)
 
-        total_steps = len(train_loader) * args.epochs
-        scheduler = get_linear_schedule_with_warmup(optimizer,
-                                                    num_warmup_steps=len(train_loader),
-                                                    num_training_steps=total_steps)
+            optimizer = AdamW(model.parameters(), lr=3e-5)
 
-        criterion = torch.nn.BCEWithLogitsLoss()
+            total_steps = len(train_loader) * args.epochs
+            scheduler = get_linear_schedule_with_warmup(optimizer,
+                                                        num_warmup_steps=len(train_loader),
+                                                        num_training_steps=total_steps)
 
-        train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion, lang, device)
+            criterion = torch.nn.BCEWithLogitsLoss()
+
+            train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion, lang, device)
 
 
 if __name__ == '__main__':
