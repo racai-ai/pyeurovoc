@@ -1,4 +1,4 @@
-bg: TurkuNLP/wikibert-base-he-cased
+bg: TurkuNLP/wikibert-base-bg-cased
 cs: TurkuNLP/wikibert-base-cs-cased
 da: Maltehb/danish-bert-botxo
 de: bert-base-german-dbmdz-cased
