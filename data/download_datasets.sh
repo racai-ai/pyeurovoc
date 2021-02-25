@@ -15,7 +15,7 @@ wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexin
 wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/en-full-eurovoc-1.0.zip
 wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/es-full-eurovoc-1.0.zip
 wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/et-full-eurovoc-1.0.zip
-wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/f1-full-eurovoc-1.0.zip
+wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/fi-full-eurovoc-1.0.zip
 wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/fr-full-eurovoc-1.0.zip
 wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/hu-full-eurovoc-1.0.zip
 wget -q -nc --show-progress https://wt-public.emm4u.eu/Resources/Eurovoc/indexing_training/it-full-eurovoc-1.0.zip

@@ -20,8 +20,6 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         loss, f1 = 0, 0
 
         for i, (train_x, train_mask, train_y) in enumerate(train_tqdm):
-            if i > 3: break
-
             train_tqdm.set_description("Training - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
             train_tqdm.refresh()
 
@@ -43,8 +41,6 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         model.eval()
 
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_tqdm):
-            if i > 3: break
-
             dev_tqdm.set_description("Evaluating - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
             dev_tqdm.refresh()
 
