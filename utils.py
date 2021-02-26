@@ -39,6 +39,15 @@ class Meter:
 
         return self.loss, self.f1k
 
+    def update_params_eval(self, logits, y_true):
+        f1k = f1k_score(y_true, torch.sigmoid(logits), 6)
+
+        self.f1k = (self.f1k * self.it + f1k) / (self.it + 1)
+
+        self.it += 1
+
+        return self.f1k
+
     def reset(self):
         """
         Resets the metrics to the 0 values. Must be used after each epoch.
