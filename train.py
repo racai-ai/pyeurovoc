@@ -16,10 +16,11 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
     for epoch in range(args.epochs):
         model.train()
         loss, f1 = 0, 0
+        print("Epoch: {}/{}".format(epoch + 1, args.epochs))
 
         for i, (train_x, train_mask, train_y) in enumerate(train_loader):
             if i % args.logging_step == 0:
-                print("Training - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, i, loss, f1))
+                print("\tTraining - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i + 1, loss, f1))
 
             optimizer.zero_grad()
 
@@ -32,13 +33,14 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
 
             loss, f1 = meter.update_params(loss, logits.cpu(), train_y.cpu())
 
+        optimizer.zero_grad()
         meter.reset()
         loss, f1 = 0, 0
         model.eval()
 
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_loader):
             if i % args.logging_step == 0:
-                print("Evaluating - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, i, loss, f1))
+                print("\tEvaluating - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i, loss, f1))
             logits = model.forward(dev_x.to(device), dev_mask.to(device))
 
             loss = criterion(logits.cpu(), dev_y.cpu())
@@ -47,7 +49,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         meter.reset()
 
         if f1 > best_f1:
-            print("\nNew best model found: {:.4f} -> {:.4f}\n".format(best_f1, f1))
+            print("\n\tNew best model found: {:.4f} -> {:.4f}\n".format(best_f1, f1))
             torch.save(model, os.path.join(args.save_path, lang, "model_{}.pt".format(split_idx)))
 
 
