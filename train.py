@@ -19,7 +19,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
 
         for i, (train_x, train_mask, train_y) in enumerate(train_loader):
             if i % args.logging_step == 0:
-                print("Training - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, i, args.epochs, loss, f1))
+                print("Training - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, i, loss, f1))
 
             optimizer.zero_grad()
 
@@ -38,7 +38,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
 
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_loader):
             if i % args.logging_step == 0:
-                print("Evaluating - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, i, args.epochs, loss, f1))
+                print("Evaluating - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, i, loss, f1))
 
             optimizer.zero_grad()
 
