@@ -9,6 +9,7 @@ import torch
 import numpy as np
 import pickle
 from utils import SEEDS
+from sklearn.utils import shuffle
 
 
 def process_document(path, tokenizer, max_len=512):
@@ -70,13 +71,13 @@ def process_document(path, tokenizer, max_len=512):
 
 def save_splits(X, masks, y, directory):
     for i, seed in enumerate(SEEDS):
-        stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.2, 0.8], random_state=seed)
+        stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.2, 0.8])
         train_idx, aux_idx = next(stratifier.split(X, y))
         train_X, train_mask, train_y = X[train_idx, :], masks[train_idx, :], y[train_idx, :]
 
         assert train_X.shape[0] == train_mask.shape[0] == train_y.shape[0]
 
-        stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.5, 0.5], random_state=seed)
+        stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[0.5, 0.5])
         dev_idx, test_idx = next(stratifier.split(X[aux_idx, :], y[aux_idx, :]))
         dev_X, dev_mask, dev_y = X[dev_idx, :], masks[dev_idx, :], y[dev_idx, :]
         test_X, test_mask, test_y = X[test_idx, :], masks[test_idx, :], y[test_idx, :]
@@ -102,6 +103,9 @@ def save_splits(X, masks, y, directory):
         np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "test_X.npy"), test_X)
         np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "test_mask.npy"), test_mask)
         np.save(os.path.join(args.data_path, directory, "split_{}".format(i), "test_y.npy"), test_y)
+
+        X, masks, y = shuffle(X, masks, y, random_state=seed)
+        
 
 
 def process_datasets(data_path, directory, tokenizer_name):
