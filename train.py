@@ -20,7 +20,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
 
         for i, (train_x, train_mask, train_y) in enumerate(train_loader):
             if i % args.logging_step == 0:
-                print("\tTraining - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i + 1, loss, f1))
+                print("\tTraining - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i , loss, f1))
 
             optimizer.zero_grad()
 
@@ -41,10 +41,12 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_loader):
             if i % args.logging_step == 0:
                 print("\tEvaluating - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i, loss, f1))
-            logits = model.forward(dev_x.to(device), dev_mask.to(device))
 
-            loss = criterion(logits.cpu(), dev_y.cpu())
-            loss, f1 = meter.update_params(loss, logits.cpu(), dev_y.cpu())
+            with torch.no_grad():
+                logits = model.forward(dev_x.to(device), dev_mask.to(device))
+
+                loss = criterion(logits.cpu(), dev_y.cpu())
+                loss, f1 = meter.update_params(loss, logits.cpu(), dev_y.cpu())
 
         meter.reset()
 
