@@ -86,7 +86,7 @@ def train():
             lang_model = AutoModel.from_pretrained(config[lang])
             model = LangModelWithDense(lang_model, num_classes).to(device)
 
-            optimizer = AdamW(model.parameters(), lr=5e-4)
+            optimizer = AdamW(model.parameters(), lr=6e-5)
 
             total_steps = len(train_loader) * args.epochs
             scheduler = get_linear_schedule_with_warmup(optimizer,
