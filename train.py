@@ -41,7 +41,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
                 print("Evaluating - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, i, loss, f1))
             logits = model.forward(dev_x.to(device), dev_mask.to(device))
 
-            loss = criterion(logits.to(device), dev_y.to(device))
+            loss = criterion(logits.cpu(), dev_y.cpu())
             loss, f1 = meter.update_params(loss, logits.cpu(), dev_y.cpu())
 
         meter.reset()
