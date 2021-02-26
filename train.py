@@ -39,16 +39,9 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_loader):
             if i % args.logging_step == 0:
                 print("Evaluating - Epoch: {}/{}, It: {}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, i, loss, f1))
-
-            optimizer.zero_grad()
-
             logits = model.forward(dev_x.to(device), dev_mask.to(device))
 
             loss = criterion(logits.to(device), dev_y.to(device))
-            loss.backward()
-            optimizer.step()
-            scheduler.step()
-
             loss, f1 = meter.update_params(loss, logits.cpu(), dev_y.cpu())
 
         meter.reset()
@@ -81,7 +74,7 @@ def train():
         if not os.path.exists(os.path.join(args.save_path, lang)):
             os.makedirs(os.path.join(args.save_path, lang))
 
-        for split_idx, (train_loader, dev_loader, test_loader, num_classes) in enumerate(datasets):
+        for split_idx, (train_loader, dev_loader, _, num_classes) in enumerate(datasets):
             print("\nTraining for language: '{}' using: '{}'...".format(lang, config[lang]))
 
             lang_model = AutoModel.from_pretrained(config[lang])
