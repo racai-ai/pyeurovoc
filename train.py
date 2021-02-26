@@ -3,7 +3,6 @@ import yaml
 from load import load_data
 from model import LangModelWithDense
 from transformers import *
-from tqdm import tqdm
 import torch
 from utils import Meter
 import os
@@ -15,13 +14,12 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
     best_f1 = -1
 
     for epoch in range(args.epochs):
-        train_tqdm = tqdm(train_loader, leave=False)
         model.train()
         loss, f1 = 0, 0
 
-        for i, (train_x, train_mask, train_y) in enumerate(train_tqdm):
-            train_tqdm.set_description("Training - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
-            train_tqdm.refresh()
+        for i, (train_x, train_mask, train_y) in enumerate(train_loader):
+            if i % args.logging_step == 0:
+                print("Training - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
 
             optimizer.zero_grad()
 
@@ -35,14 +33,12 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
             loss, f1 = meter.update_params(loss, logits.cpu(), train_y.cpu())
 
         meter.reset()
-
-        dev_tqdm = tqdm(dev_loader, leave=False)
         loss, f1 = 0, 0
         model.eval()
 
-        for i, (dev_x, dev_mask, dev_y) in enumerate(dev_tqdm):
-            dev_tqdm.set_description("Evaluating - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
-            dev_tqdm.refresh()
+        for i, (dev_x, dev_mask, dev_y) in enumerate(dev_loader):
+            if i % args.logging_step == 0:
+                print("Evaluating - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
 
             optimizer.zero_grad()
 
@@ -58,7 +54,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         meter.reset()
 
         if f1 > best_f1:
-            print("\nNew best model found: {:.4f} -> {:.4f}".format(best_f1, f1))
+            print("\nNew best model found: {:.4f} -> {:.4f}\n".format(best_f1, f1))
             torch.save(model, os.path.join(args.save_path, lang, "model_{}.pt".format(split_idx)))
 
 
@@ -111,6 +107,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", type=int, default=2, help="Batch size of the dataset.")
     parser.add_argument("--device", type=str, default="cpu", help="Device to train on.")
     parser.add_argument("--save_path", type=str, default="models", help="Save path of the models")
+    parser.add_argument("--logging_step", type=int, default=100)
     parser.add_argument("--verbose", type=int, default=0)
 
     args = parser.parse_args()
