@@ -32,7 +32,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
             optimizer.step()
             scheduler.step()
 
-            loss, f1 = meter.update_params(loss, logits, train_y)
+            loss, f1 = meter.update_params(loss, logits.cpu(), train_y.cpu())
 
         meter.reset()
 
@@ -53,7 +53,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
             optimizer.step()
             scheduler.step()
 
-            loss, f1 = meter.update_params(loss, logits, dev_y)
+            loss, f1 = meter.update_params(loss, logits.cpu(), dev_y.cpu())
 
         meter.reset()
 
@@ -77,6 +77,9 @@ def train():
     print("Loading preprocessed datasets...")
 
     for lang in config.keys():
+        if not lang == "ro":
+            continue
+
         datasets = load_data(args.data_path, lang, args.batch_size)
 
         if not os.path.exists(os.path.join(args.save_path, lang)):
