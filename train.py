@@ -28,6 +28,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
 
             loss = criterion(logits.to(device), train_y.to(device))
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
             optimizer.step()
             scheduler.step()
 
@@ -53,6 +54,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         if f1 > best_f1:
             print("\n\tNew best model found: {:.4f} -> {:.4f}\n".format(best_f1, f1))
             torch.save(model, os.path.join(args.save_path, lang, "model_{}.pt".format(split_idx)))
+            best_f1 = f1
 
 
 def train():
@@ -84,7 +86,7 @@ def train():
             lang_model = AutoModel.from_pretrained(config[lang])
             model = LangModelWithDense(lang_model, num_classes).to(device)
 
-            optimizer = AdamW(model.parameters(), lr=3e-5)
+            optimizer = AdamW(model.parameters(), lr=5e-4)
 
             total_steps = len(train_loader) * args.epochs
             scheduler = get_linear_schedule_with_warmup(optimizer,
@@ -104,6 +106,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", type=int, default=2, help="Batch size of the dataset.")
     parser.add_argument("--device", type=str, default="cpu", help="Device to train on.")
     parser.add_argument("--save_path", type=str, default="models", help="Save path of the models")
+    parser.add_argument("--max_grad_norm", type=int, default=5, help="Gradient clipping norm.")
     parser.add_argument("--logging_step", type=int, default=100)
     parser.add_argument("--verbose", type=int, default=0)
 
