@@ -107,7 +107,6 @@ def save_splits(X, masks, y, directory):
         X, masks, y = shuffle(X, masks, y, random_state=seed)
         
 
-
 def process_datasets(data_path, directory, tokenizer_name):
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
 

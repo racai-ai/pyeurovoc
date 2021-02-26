@@ -9,7 +9,7 @@ from utils import Meter
 import os
 
 
-def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion, lang, device):
+def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion, lang, split_idx, device):
     meter = Meter()
 
     best_f1 = -1
@@ -20,6 +20,8 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         loss, f1 = 0, 0
 
         for i, (train_x, train_mask, train_y) in enumerate(train_tqdm):
+            if i > 2: break
+
             train_tqdm.set_description("Training - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
             train_tqdm.refresh()
 
@@ -41,6 +43,8 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         model.eval()
 
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_tqdm):
+            if i > 2: break
+
             dev_tqdm.set_description("Evaluating - Epoch: {}/{}, Loss: {:.4f}, F1: {:.4f}".format(epoch + 1, args.epochs, loss, f1))
             dev_tqdm.refresh()
 
@@ -59,7 +63,7 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
 
         if f1 > best_f1:
             print("\nNew best model found: {:.4f} -> {:.4f}".format(best_f1, f1))
-            torch.save(model, os.path.join(args.save_path, "{}_model.pt".format(lang)))
+            torch.save(model, os.path.join(args.save_path, lang, "model_{}.pt".format(split_idx)))
 
 
 def train():
@@ -79,6 +83,9 @@ def train():
     for lang in config.keys():
         datasets = load_data(args.data_path, lang, args.batch_size)
 
+        if not os.path.exists(os.path.join(args.save_path, lang)):
+            os.makedirs(os.path.join(args.save_path, lang))
+
         for split_idx, (train_loader, dev_loader, test_loader, num_classes) in enumerate(datasets):
             print("\nTraining for language: '{}' using: '{}'...".format(lang, config[lang]))
 
@@ -94,7 +101,7 @@ def train():
 
             criterion = torch.nn.BCEWithLogitsLoss()
 
-            train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion, lang, device)
+            train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion, lang, split_idx, device)
 
 
 if __name__ == '__main__':
