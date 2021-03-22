@@ -152,7 +152,7 @@ def preprocess_data():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, default="configs/models.yml", help="Tokenizer used for each language.")
+    parser.add_argument("--config", type=str, default="pyeurovoc/configs/models.yml", help="Tokenizer used for each language.")
     parser.add_argument("--data_path", type=str, default="data/eurovoc", help="Path to the EuroVoc data.")
     parser.add_argument("--verbose", type=int, default=0)
 

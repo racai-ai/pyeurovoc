@@ -1,7 +1,7 @@
 import argparse
 import yaml
 from load import load_data
-from model import LangModelWithDense
+from eurovoc_transformers.model import LangModelWithDense
 from transformers import *
 import torch
 from utils import Meter
@@ -19,6 +19,9 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         print("Epoch: {}/{}".format(epoch + 1, args.epochs))
 
         for i, (train_x, train_mask, train_y) in enumerate(train_loader):
+            if i > 1:
+                break
+
             if i % args.logging_step == 0:
                 print("\tTraining - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i , loss, f1))
 
@@ -40,6 +43,9 @@ def train_model(model, train_loader, dev_loader, optimizer, scheduler, criterion
         model.eval()
 
         for i, (dev_x, dev_mask, dev_y) in enumerate(dev_loader):
+            if i > 1:
+                break
+
             if i % args.logging_step == 0:
                 print("\tEvaluating - It: {}, Loss: {:.4f}, F1: {:.4f}".format(i, loss, f1))
 
@@ -100,7 +106,7 @@ def train():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, default="configs/models.yml", help="Tokenizer used for each language.")
+    parser.add_argument("--config", type=str, default="pyeurovoc/configs/models.yml", help="Tokenizer used for each language.")
     parser.add_argument("--data_path", type=str, default="data/eurovoc", help="Path to the EuroVoc data.")
     parser.add_argument("--epochs", type=int, default=1, help="Number of epochs to train the model.")
     parser.add_argument("--batch_size", type=int, default=2, help="Batch size of the dataset.")

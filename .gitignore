@@ -1,6 +1,7 @@
 data/eurovoc/
 .idea/
 models/
+convert_models.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
