@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import json
+from sklearn.metrics import ndcg_score
 
 
 SEEDS = [110, 221, 332, 443, 554]
@@ -18,6 +19,10 @@ class Meter:
         self.f1k = 0
         self.f1k_mt = 0
         self.f1k_domain = 0
+        self.ndcg_1 = 0
+        self.ndcg_3 = 0
+        self.ndcg_5 = 0
+        self.ndcg_10 = 0
 
         self.it = 0
 
@@ -35,7 +40,7 @@ class Meter:
                      zip(true_labels, pred_labels)]
         f1k_scores = [2 * recall * precision / (recall + precision) for recall, precision in zip(pk_scores, rk_scores)]
 
-        return sum(f1k_scores) / len(f1k_scores)
+        return sum(f1k_scores) / len(f1k_scores) * 100
 
     def f1k_mt_scores(self, y_true, probs, eps=1e-10):
         true_labels = self.mlb_encoder.inverse_transform(y_true)
@@ -71,7 +76,7 @@ class Meter:
         f1k_domain_scores = [2 * recall * precision / (recall + precision) for recall, precision in
                              zip(pk_domain_scores, rk_domain_scores)]
 
-        return sum(f1k_mt_scores) / len(f1k_mt_scores), sum(f1k_domain_scores) / len(f1k_domain_scores)
+        return sum(f1k_mt_scores) / len(f1k_mt_scores) * 100, sum(f1k_domain_scores) / len(f1k_domain_scores) * 100
 
     def update_params(self, loss, logits, y_true):
         f1k = self.f1k_scores(y_true, torch.sigmoid(logits))
@@ -86,10 +91,18 @@ class Meter:
     def update_params_eval(self, logits, y_true):
         f1k = self.f1k_scores(y_true, torch.sigmoid(logits))
         f1k_mt, f1k_domain = self.f1k_mt_scores(y_true, torch.sigmoid(logits))
+        ndcg_1 = ndcg_score(y_true.detach().numpy(), torch.sigmoid(logits).detach().numpy(), 1) * 100
+        ndcg_3 = ndcg_score(y_true.detach().numpy(), torch.sigmoid(logits).detach().numpy(), 3) * 100
+        ndcg_5 = ndcg_score(y_true.detach().numpy(), torch.sigmoid(logits).detach().numpy(), 5) * 100
+        ndcg_10 = ndcg_score(y_true.detach().numpy(), torch.sigmoid(logits).detach().numpy(), 10) * 100
 
         self.f1k = (self.f1k * self.it + f1k) / (self.it + 1)
         self.f1k_mt = (self.f1k_mt * self.it + f1k_mt) / (self.it + 1)
         self.f1k_domain = (self.f1k_domain * self.it + f1k_domain) / (self.it + 1)
+        self.ndcg_1 = (self.ndcg_1 * self.it + ndcg_1) / (self.it + 1)
+        self.ndcg_3 = (self.ndcg_3 * self.it + ndcg_3) / (self.it + 1)
+        self.ndcg_5 = (self.ndcg_5 * self.it + ndcg_5) / (self.it + 1)
+        self.ndcg_10 = (self.ndcg_10 * self.it + ndcg_10) / (self.it + 1)
 
         self.it += 1
 

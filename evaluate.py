@@ -53,6 +53,10 @@ def evaluate():
         f1k_scores = []
         f1k_mt_scores = []
         f1k_domain_scores = []
+        ndcg_1_scores = []
+        ndcg_3_scores = []
+        ndcg_5_scores = []
+        ndcg_10_scores = []
 
         for split_idx, (_, _, test_loader, _) in enumerate(datasets[:2]):
             print("\nEvaluating model: '{}'...".format("model_{}.pt".format(split_idx)))
@@ -62,19 +66,31 @@ def evaluate():
 
             meter = evaluate_model(model, test_loader, mlb_encoder, mt_labels, device)
 
-            print("Test results -  F1@6: {:.4f}, F1@6_MT: {:.4f}, F1@6_Domain: {:.4f}".format(meter.f1k,
-                                                                                              meter.f1k_mt,
-                                                                                              meter.f1k_domain))
+            print("Test results -  F1@6: {:.2f}, F1@6_MT: {:.2f}, F1@6_DO: {:.2f}\n"
+                  "                NDCG@1: {:.2f}, NDCG@3: {:.2f}, NDCG@5: {:.2f}, NDCG@10: {:.2f}".
+                  format(meter.f1k, meter.f1k_mt, meter.f1k_domain,
+                         meter.ndcg_1, meter.ndcg_3, meter.ndcg_5, meter.ndcg_10))
 
-            f1k_scores.append(meter.f1k * 100)
-            f1k_mt_scores.append(meter.f1k_mt * 100)
-            f1k_domain_scores.append(meter.f1k_domain * 100)
+            f1k_scores.append(meter.f1k)
+            f1k_mt_scores.append(meter.f1k_mt)
+            f1k_domain_scores.append(meter.f1k_domain)
+            ndcg_1_scores.append(meter.ndcg_1)
+            ndcg_3_scores.append(meter.ndcg_3)
+            ndcg_5_scores.append(meter.ndcg_5)
+            ndcg_10_scores.append(meter.ndcg_10)
 
-        print("\nOverall results for language '{}' - F1@6: {:.2f} ± ({:.2f}), F1@6_MT: {:.2f} ± "
-              "({:.2f}), F1@6_Domain: {:.2f} ± ({:.2f})".format(lang,
+        print("\nOverall results for language '{}' - "
+              "F1@6: {:.2f} ± ({:.2f}), F1@6_MT: {:.2f} ± ({:.2f}), F1@6_DO: {:.2f} ± ({:.2f})\n"
+              "                                    "
+              "NDCG@1: {:.2f} ± ({:.2f}), NDCG@3: {:.2f} ± ({:.2f}), NDCG@5: {:.2f} ± ({:.2f}), NDCG@10: {:.2f} ± ({:.2f})".
+                                                                format(lang,
                                                                 np.mean(f1k_scores), np.std(f1k_scores),
                                                                 np.mean(f1k_mt_scores), np.std(f1k_mt_scores),
-                                                                np.mean(f1k_domain_scores), np.std(f1k_domain_scores)))
+                                                                np.mean(f1k_domain_scores), np.std(f1k_domain_scores),
+                                                                np.mean(ndcg_1_scores), np.std(ndcg_1_scores),
+                                                                np.mean(ndcg_3_scores), np.std(ndcg_3_scores),
+                                                                np.mean(ndcg_5_scores), np.std(ndcg_5_scores),
+                                                                np.mean(ndcg_10_scores), np.std(ndcg_10_scores)))
 
 
 if __name__ == "__main__":
