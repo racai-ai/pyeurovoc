@@ -11,7 +11,7 @@ class Meter:
     """
      This class is used to keep track of the metrics in the train and dev loops.
     """
-    def __init__(self, mlb_encoder=None, mt_labels=None, k=6):
+    def __init__(self, mlb_encoder=None, mt_labels=None, k=6, k_mt=5, k_do=4):
         """
         :param target_classes: The classes for whom the metrics will be calculated.
         """
@@ -29,6 +29,8 @@ class Meter:
         self.mlb_encoder = mlb_encoder
         self.mt_labels = mt_labels
         self.k = k
+        self.k_mt = k_mt
+        self.k_do = k_do
 
     def f1k_scores(self, y_true, probs, eps=1e-10):
         true_labels = [torch.nonzero(labels, as_tuple=True)[0] for labels in y_true]
@@ -60,8 +62,8 @@ class Meter:
         pred_labels_mt = []
         pred_labels_domain = []
         for labels in pred_labels:
-            pred_labels_mt.append(np.unique([self.mt_labels[str(label)] for label in labels]).astype(np.int32))
-            pred_labels_domain.append(np.unique([self.mt_labels[str(label)][:2] for label in labels]).astype(np.int32))
+            pred_labels_mt.append(np.unique([self.mt_labels[str(label)] for label in labels]).astype(np.int32)[:self.k_mt])
+            pred_labels_domain.append(np.unique([self.mt_labels[str(label)][:2] for label in labels]).astype(np.int32)[:self.k_do])
 
         pk_mt_scores = [np.intersect1d(true, pred).shape[0] / pred.shape[0] + eps for true, pred in
                         zip(true_labels_mt, pred_labels_mt)]
