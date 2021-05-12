@@ -31,15 +31,12 @@ def predict():
         input_ids = tokenizer.encode(content["data"], return_tensors="pt")
         mask = torch.ones_like(input_ids)
 
-        output = model(input_ids, mask)[0]
+        with torch.no_grad():
+            output = model(input_ids, mask)[0]
 
         id_labels = torch.sort(output, descending=True)[1].tolist()
         mt_labels = [dict_mt_labels[str(label)]for label in id_labels  if str(label) in dict_mt_labels]
         do_labels = [dict_mt_labels[str(label)][:2] for label in id_labels if str(label) in dict_mt_labels]
-
-        print(id_labels)
-        print(mt_labels)
-        print(do_labels)
 
         return {
             "id_labels": [str(label) for label in id_labels[:config["num_id_labels"]]],
