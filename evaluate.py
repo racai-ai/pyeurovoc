@@ -39,9 +39,6 @@ def evaluate():
     print("Working on device: {}\n".format(args.device))
 
     for lang in config.keys():
-        if not lang == "ro":
-            continue
-
         with open(os.path.join(args.data_path, "{}-full-eurovoc-1.0".format(lang), "mlb_encoder.pickle"), "rb") as file:
             mlb_encoder = pickle.load(file)
 
@@ -59,6 +56,9 @@ def evaluate():
         ndcg_10_scores = []
 
         for split_idx, (_, _, test_loader, _) in enumerate(datasets[:2]):
+            if not os.path.exists(os.path.join(args.models_path, lang, "model_{}.pt".format(split_idx))):
+                break
+
             print("\nEvaluating model: '{}'...".format("model_{}.pt".format(split_idx)))
 
             model = torch.load(os.path.join(args.models_path, lang, "model_{}.pt".format(split_idx)), map_location=device)

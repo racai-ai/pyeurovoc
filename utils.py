@@ -56,24 +56,32 @@ class Meter:
         true_labels_mt = []
         true_labels_domain = []
         for labels in true_labels:
-            true_labels_mt.append(np.unique([self.mt_labels[str(label)] for label in labels]).astype(np.int32))
-            true_labels_domain.append(np.unique([self.mt_labels[str(label)][:2] for label in labels]).astype(np.int32))
+            true_labels_mt.append(np.unique([self.mt_labels.get(str(label), 0) for label in labels]).astype(np.int32))
+            true_labels_domain.append(np.unique([self.mt_labels.get(str(label), "00")[:2] for label in labels]).astype(np.int32))
 
         pred_labels_mt = []
         pred_labels_domain = []
         for labels in pred_labels:
-            pred_labels_mt.append(np.unique([self.mt_labels[str(label)] for label in labels]).astype(np.int32)[:self.k_mt])
-            pred_labels_domain.append(np.unique([self.mt_labels[str(label)][:2] for label in labels]).astype(np.int32)[:self.k_do])
+            pred_labels_mt.append(np.unique([self.mt_labels.get(str(label), 0) for label in labels]).astype(np.int32)[:self.k_mt])
+            pred_labels_domain.append(np.unique([self.mt_labels.get(str(label), "00")[:2] for label in labels]).astype(np.int32)[:self.k_do])
 
-        pk_mt_scores = [np.intersect1d(true, pred).shape[0] / pred.shape[0] + eps for true, pred in
-                        zip(true_labels_mt, pred_labels_mt)]
-        rk_mt_scores = [np.intersect1d(true, pred).shape[0] / true.shape[0] + eps for true, pred in
-                        zip(true_labels_mt, pred_labels_mt)]
-        f1k_mt_scores = [2 * recall * precision / (recall + precision) for recall, precision in zip(pk_mt_scores, rk_mt_scores)]
+        true_labels_mt = [label[label != 0] for label in true_labels_mt]
+        pred_labels_mt = [label[label != 0] for label in pred_labels_mt]
+        true_labels_domain = [label[label != 0] for label in true_labels_domain]
+        pred_labels_domain = [label[label != 0] for label in pred_labels_domain]
 
-        pk_domain_scores = [np.intersect1d(true, pred).shape[0] / pred.shape[0] + eps for true, pred in
+        # print(true_labels_mt)
+        # print(pred_labels_mt)
+
+        pk_mt_scores = [np.intersect1d(true, pred).shape[0] / pred.shape[0] + eps if pred.shape[0] != 0 else eps for true, pred in
+                        zip(true_labels_mt, pred_labels_mt)]
+        rk_mt_scores = [np.intersect1d(true, pred).shape[0] / true.shape[0] + eps if pred.shape[0] != 0 else eps for true, pred in
+                        zip(true_labels_mt, pred_labels_mt)]
+        f1k_mt_scores = [2 * recall * precision / (recall + precision + eps) for recall, precision in zip(pk_mt_scores, rk_mt_scores)]
+
+        pk_domain_scores = [np.intersect1d(true, pred).shape[0] / pred.shape[0] + eps if pred.shape[0] != 0 else eps for true, pred in
                             zip(true_labels_domain, pred_labels_domain)]
-        rk_domain_scores = [np.intersect1d(true, pred).shape[0] / true.shape[0] + eps for true, pred in
+        rk_domain_scores = [np.intersect1d(true, pred).shape[0] / true.shape[0] + eps if pred.shape[0] != 0 else eps for true, pred in
                             zip(true_labels_domain, pred_labels_domain)]
         f1k_domain_scores = [2 * recall * precision / (recall + precision) for recall, precision in
                              zip(pk_domain_scores, rk_domain_scores)]

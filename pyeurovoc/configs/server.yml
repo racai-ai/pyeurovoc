@@ -1,0 +1,12 @@
+server:
+  host: "127.0.0.1"
+  port: 8080
+
+model:
+  model_path: "models/ro/model_0.pt"
+  language_model: "dumitrescustefan/bert-base-romanian-cased-v1"
+
+mt_labels_path: "pyeurovoc/resources/mt_labels.json"
+num_id_labels: 6
+num_mt_labels: 5
+num_do_labels: 4
