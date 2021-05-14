@@ -52,7 +52,7 @@ plt.xticks(list_ticks, labels=list_sequence_length)
 plt.scatter(list_ticks, list_cpu_times)
 plt.scatter(list_ticks, list_gpu_times)
 plt.xlabel("Sequence length")
-plt.ylabel("Latency (s)")
+plt.ylabel("Latency")
 plt.legend()
 
 plt.show()
