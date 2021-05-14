@@ -2,3 +2,5 @@ transformers
 sklearn
 scikit-multilearn
 pyyaml
+waitress
+flask
