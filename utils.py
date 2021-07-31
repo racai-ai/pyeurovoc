@@ -70,9 +70,6 @@ class Meter:
         true_labels_domain = [label[label != 0] for label in true_labels_domain]
         pred_labels_domain = [label[label != 0] for label in pred_labels_domain]
 
-        # print(true_labels_mt)
-        # print(pred_labels_mt)
-
         pk_mt_scores = [np.intersect1d(true, pred).shape[0] / pred.shape[0] + eps if pred.shape[0] != 0 else eps for true, pred in
                         zip(true_labels_mt, pred_labels_mt)]
         rk_mt_scores = [np.intersect1d(true, pred).shape[0] / true.shape[0] + eps if pred.shape[0] != 0 else eps for true, pred in

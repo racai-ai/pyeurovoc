@@ -10,7 +10,7 @@ setup(
     # $ pip install sampleproject
     name='pyeurovoc',  # Required
 
-    version='0.0.0',  # Required
+    version='0.1.0',  # Required
 
     description='Python API for multilingual legal document classification with EuroVoc descriptors using BERT models.',  # Required
 
@@ -27,7 +27,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Production/Stable',
+        'Development Status :: 3 - Alpha',
 
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
@@ -51,9 +51,9 @@ setup(
     keywords='eurovoc bert legal document classification',  # Optional
 
     # packages=find_packages(exclude=['jupyter']),  # Required
-    packages=find_packages("pyeurovoc"),  # Required
+    packages=find_packages("."),  # Required
 
     install_requires=['transformers', 'sklearn', 'torch', 'scikit-multilearn', 'pyyaml', 'waitress', 'flask'],  # Optional
 
-    zip_safe=False
+    zip_safe=False,
 )
