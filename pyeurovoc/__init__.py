@@ -3,10 +3,11 @@ import torch
 import pickle
 import json
 from transformers import AutoTokenizer
+from .util import download_file
 
 
 PYEUROVOC_PATH = os.path.join(os.path.expanduser("~"), ".cache", "pyeurovoc")
-REPOSITORY_URL = ""
+REPOSITORY_URL = "https://relate.racai.ro/resources/eurovocbert/models/"
 
 DICT_MODELS = {
     "bg": "TurkuNLP/wikibert-base-bg-cased",
@@ -44,8 +45,13 @@ class EuroVocBERT:
 
         # model must be downloaded from the repostiory
         if not os.path.exists(os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt")):
-            print(f"Model 'model_{lang}.pt' not found in the .cache directory at '{PYEUROVOC_PATH}'. "
+            print(f"Model 'model_{lang}.pt' not found in the .cache directory at '{PYEUROVOC_PATH}'\n"
                   f"Downloading from '{REPOSITORY_URL}'...")
+
+            download_file(
+                REPOSITORY_URL + f"model_{lang}.pt",
+                os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt")
+            )
         # model already exists, loading from .cache directory
         else:
             print(f"Model 'model_{lang}.pt' found in the .cache directory at '{PYEUROVOC_PATH}'. "
@@ -56,8 +62,13 @@ class EuroVocBERT:
 
         # load the multi-label encoder for eurovoc, y, download from repository if not found in .cache directory
         if not os.path.exists(os.path.join(PYEUROVOC_PATH, f"mlb_encoder_{lang}.pickle")):
-            print(f"Label encoder 'mlb_encoder_{lang}.pickle' not found in the .cache directory at '{PYEUROVOC_PATH}'."
+            print(f"Label encoder 'mlb_encoder_{lang}.pickle' not found in the .cache directory at '{PYEUROVOC_PATH}'\n"
                   f" Downloading from '{REPOSITORY_URL}'...")
+
+            download_file(
+                REPOSITORY_URL + f"mlb_encoder_{lang}.pickle",
+                os.path.join(PYEUROVOC_PATH, f"mlb_encoder_{lang}.pickle")
+            )
         else:
             print(f"Label encoder 'mlb_encoder_{lang}.pickle' found in the .cache directory at '{PYEUROVOC_PATH}'."
                   f" Loading...")
@@ -65,21 +76,10 @@ class EuroVocBERT:
         with open(os.path.join(PYEUROVOC_PATH, f"mlb_encoder_{lang}.pickle"), "rb") as pck_file:
             self.mlb_encoder = pickle.load(pck_file)
 
-        # load MT descriptors dictionary, download from repository if not found in .cache directory
-        if not os.path.exists(os.path.join(PYEUROVOC_PATH, "mt_labels.json")):
-            print(f"MT descriptors dictionary 'mt_labels.json' not found in the .cache directory at '{PYEUROVOC_PATH}'."
-                  f" Downloading from '{REPOSITORY_URL}'...")
-        else:
-            print(f"MT descriptors dictionary 'mt_labels.json' found in the .cache directory at '{PYEUROVOC_PATH}'. "
-                  f"Loading...")
-
-        with open(os.path.join(PYEUROVOC_PATH, "mt_labels.json"), "r") as json_file:
-            self.dict_mt_labels = json.load(json_file)
-
         # load the tokenizer according to the model dictionary
         self.tokenizer = AutoTokenizer.from_pretrained(DICT_MODELS[lang])
 
-    def __call__(self, document_text, num_id_labels=6):
+    def __call__(self, document_text, num_labels=6):
         input_ids = self.tokenizer.encode(
             document_text,
             return_attention_mask=True,
@@ -99,10 +99,10 @@ class EuroVocBERT:
         probs_sorted, idx = torch.sort(probs, descending=True)
 
         outputs = torch.zeros_like(logits)
-        outputs[idx[:num_id_labels]] = 1
+        outputs[idx[:num_labels]] = 1
 
         id_labels = self.mlb_encoder.inverse_transform(outputs.reshape(1, -1))[0]
-        id_probs = probs[idx[:num_id_labels]]
+        id_probs = probs[idx[:num_labels]]
 
         result = {}
 
