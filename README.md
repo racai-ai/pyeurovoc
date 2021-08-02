@@ -40,3 +40,21 @@ Which outputs:
 ``` python
 {'155': 0.9995473027229309, '230': 0.9377984404563904, '889': 0.9193254113197327, '1519': 0.714003324508667}
 ```
+
+## Training your own models
+
+### Download Dataset
+
+Firstly, you need to download the datasets. Use the `download_datasets.sh` script in data to do that.
+
+``` sh
+./download_datasets.sh
+```
+
+### Preprocess
+
+Once the datasets has finished downloading, you need to preprocess them using the `preprocess.py` script. It takes as input the model per language configuration file and the path to the dataset.
+
+```
+python preprocess.py --config [model_config] --data_path [dataset_path]
+```
