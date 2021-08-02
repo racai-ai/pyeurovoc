@@ -2,7 +2,7 @@
 
 PyEuroVoc is a tool for legal document classification with [EuroVoc](https://eur-lex.europa.eu/browse/eurovoc.html) descriptors. It supports 22 languages: Bulgarian (bg), Czech (cs), Danish (da), German (de), Greek (el), English (en), Spanish (es), Estonian (et), Finnish (fi), French (fr), Hungarian (hu), Italian (it), Lithuanian (lt), Latvian (lv), Maltese (mt), Dutch (nl), Polish (pl), Portuguese (pt), Romanian (ro), Slovak (sk), Slovenian (sl), Sweedish (sv). 
 
-The tool uses BERT at its core. The list of BERT variant for each language can be found [here]().
+The tool uses BERT at its core. The list of BERT variant for each language can be found [here](). The performance of each model is outlined in the [paper]().
 
 ## Installation
 
@@ -30,6 +30,7 @@ The prediction of the model is a dictionary that contains the predicted ID descr
 ```
 
 The number of most probable labels returned by the model is controlled by the `num_labels` parameter (default is 6).
+
 
 ``` python
 prediction = model("Commission Decision on a modification of the system of aid applied in Italy in respect of shipbuilding", num_labels=4)
