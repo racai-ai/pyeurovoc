@@ -87,6 +87,10 @@ python evaluate.py --config [model_config] --mt_labels [mt_labels_path] --data_p
                    --verbose [verbose]
 ```
 
+## Acknowledgments
+
+This research was supported by the EC grant no. INEA/CEF/ICT/A2017/1565710 for the Action no. 2017-EU-IA-0136 entitled “Multilingual Resources for CEF.AT in the legal domain” (MARCELL).
+
 ## Credits
 
 Coming soon...
