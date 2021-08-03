@@ -16,6 +16,10 @@ def download_file(url, save_path):
                 downloaded += len(data)
                 f.write(data)
                 done = int(50 * downloaded / total)
-                sys.stdout.write('\r[{}{}{}] {}%'.format('=' * (done-1), ">",  '.' * (50 - done), done*2))
+                sys.stdout.write('\r[{}{}{}] {}% [{:.2f}/{:.2f} MB]'.format(
+                    '=' * (done-1), ">",  '.' * (50 - done), done*2,
+                    downloaded / (1024 * 1024),
+                    total / (1024 * 1024)
+                ))
                 sys.stdout.flush()
     sys.stdout.write('\n\n')
