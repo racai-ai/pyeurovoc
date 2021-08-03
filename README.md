@@ -58,3 +58,37 @@ Once the datasets has finished downloading, you need to preprocess them using th
 ```
 python preprocess.py --config [model_config] --data_path [dataset_path]
 ```
+
+### Train
+
+Training is done using the `train.py` script. It will automatically load the preprocessed files created by the previous step, and will save the best model for each split at the path given by the `-save_path` argument. To view the full list of available arguments, run `python train.py --help`.
+
+```
+python train.py --config [model_config] --data_path [dataset_path] 
+                --epochs [n_epochs] --batch_size [batch_size] 
+                --max_grad_norm [max_grad_norm]
+                --device [device]
+                --save_path [model_save_path]
+                --logging_step [logging_step]
+                --verbose [verbose]
+```
+
+### Evaluate
+
+To evaluate the performance of each model on a split, run the `evaluate.py` script. As in the case of training, it provides several arguments that can be visualized with `python evaluate.py --help`.
+
+```
+python evaluate.py --config [model_config] --mt_labels [mt_labels_path] --data_path [dataset_path]
+                   --models_path [models_ckpt_path] 
+                   --batch_size [batch_size]
+                   --device [device]
+                   --output_path [results_output_path]
+                   --loggin_step [logging_step]
+                   --verbose [verbose]
+```
+
+## Credits
+
+Coming soon...
+
+
