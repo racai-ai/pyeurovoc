@@ -106,7 +106,7 @@ def train():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, default="pyeurovoc/configs/models.yml", help="Tokenizer used for each language.")
+    parser.add_argument("--config", type=str, default="configs/models.yml", help="Tokenizer used for each language.")
     parser.add_argument("--data_path", type=str, default="data/eurovoc", help="Path to the EuroVoc data.")
     parser.add_argument("--epochs", type=int, default=1, help="Number of epochs to train the model.")
     parser.add_argument("--batch_size", type=int, default=2, help="Batch size of the dataset.")

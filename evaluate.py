@@ -10,7 +10,7 @@ import pickle
 
 
 def evaluate_model(model, test_loader, mlb_encoder, mt_labels, device):
-    meter = Meter(mt_labels=mt_labels, mlb_encoder=mlb_encoder)
+    meter = Meter(mt_labels=mt_labels, mlb_encoder=mlb_encoder, k=1)
     f1 = 0
 
     for i, (dev_x, dev_mask, dev_y) in enumerate(test_loader):
@@ -47,6 +47,8 @@ def evaluate():
         if not os.path.exists(os.path.join(args.output_path, lang)):
             os.makedirs(os.path.join(args.output_path, lang))
 
+        pk_scores = []
+        rk_scores = []
         f1k_scores = []
         f1k_mt_scores = []
         f1k_domain_scores = []
@@ -71,6 +73,8 @@ def evaluate():
                   format(meter.f1k, meter.f1k_mt, meter.f1k_domain,
                          meter.ndcg_1, meter.ndcg_3, meter.ndcg_5, meter.ndcg_10))
 
+            pk_scores.append(meter.pk)
+            rk_scores.append(meter.rk)
             f1k_scores.append(meter.f1k)
             f1k_mt_scores.append(meter.f1k_mt)
             f1k_domain_scores.append(meter.f1k_domain)
@@ -82,21 +86,25 @@ def evaluate():
         print("\nOverall results for language '{}' - "
               "F1@6: {:.2f} ± ({:.2f}), F1@6_MT: {:.2f} ± ({:.2f}), F1@6_DO: {:.2f} ± ({:.2f})\n"
               "                                    "
+              "P@K: {:.2f} ± ({:.2f}), R@K_DO: {:.2f} ± ({:.2f})"
+              "                                    "
               "NDCG@1: {:.2f} ± ({:.2f}), NDCG@3: {:.2f} ± ({:.2f}), NDCG@5: {:.2f} ± ({:.2f}), NDCG@10: {:.2f} ± ({:.2f})".
-                                                                format(lang,
-                                                                np.mean(f1k_scores), np.std(f1k_scores),
-                                                                np.mean(f1k_mt_scores), np.std(f1k_mt_scores),
-                                                                np.mean(f1k_domain_scores), np.std(f1k_domain_scores),
-                                                                np.mean(ndcg_1_scores), np.std(ndcg_1_scores),
-                                                                np.mean(ndcg_3_scores), np.std(ndcg_3_scores),
-                                                                np.mean(ndcg_5_scores), np.std(ndcg_5_scores),
-                                                                np.mean(ndcg_10_scores), np.std(ndcg_10_scores)))
+                format(lang,
+                np.mean(f1k_scores), np.std(f1k_scores),
+                np.mean(f1k_mt_scores), np.std(f1k_mt_scores),
+                np.mean(f1k_domain_scores), np.std(f1k_domain_scores),
+                np.mean(pk_scores), np.std(pk_scores),
+                np.mean(rk_scores), np.std(rk_scores),
+                np.mean(ndcg_1_scores), np.std(ndcg_1_scores),
+                np.mean(ndcg_3_scores), np.std(ndcg_3_scores),
+                np.mean(ndcg_5_scores), np.std(ndcg_5_scores),
+                np.mean(ndcg_10_scores), np.std(ndcg_10_scores)))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=str, default="pyeurovoc/configs/models.yml", help="Tokenizer used for each language.")
-    parser.add_argument("--mt_labels", type=str, default="pyeurovoc/resources/mt_labels.json")
+    parser.add_argument("--config", type=str, default="configs/models.yml", help="Tokenizer used for each language.")
+    parser.add_argument("--mt_labels", type=str, default="configs/mt_labels.json")
     parser.add_argument("--data_path", type=str, default="data/eurovoc", help="Path to the EuroVoc data.")
     parser.add_argument("--device", type=str, default="cpu", help="Device to train on.")
     parser.add_argument("--models_path", type=str, default="models", help="Path of the saved models.")
