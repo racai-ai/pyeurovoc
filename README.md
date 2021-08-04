@@ -99,7 +99,7 @@ Avram, Andrei-Marius, Pais, Vasile and Tufis, Dan. "PyEuroVoc: A Tool for Multil
 ```
 or in .bibtex format:
 ```
-@article{avram2019pyeurovoc,
+@article{avram2021pyeurovoc,
   title={PyEuroVoc: A Tool for Multilingual Legal Document Classification with EuroVoc Descriptors},
   author={Avram, Andrei-Marius, Pais, Vasile and Tufis, Dan},
   journal={arXiv preprint arXiv:2108.01139},
