@@ -2,7 +2,7 @@
 
 PyEuroVoc is a tool for legal document classification with [EuroVoc](https://eur-lex.europa.eu/browse/eurovoc.html) descriptors. It supports 22 languages: Bulgarian (bg), Czech (cs), Danish (da), German (de), Greek (el), English (en), Spanish (es), Estonian (et), Finnish (fi), French (fr), Hungarian (hu), Italian (it), Lithuanian (lt), Latvian (lv), Maltese (mt), Dutch (nl), Polish (pl), Portuguese (pt), Romanian (ro), Slovak (sk), Slovenian (sl), Sweedish (sv). 
 
-The tool uses BERT at its core. The list of BERT variant for each language can be found [here](). The performance of each model is outlined in our [paper]().
+The tool uses BERT at its core. The list of BERT variant for each language can be found [here](). The performance of each model is outlined in our [paper](https://arxiv.org/abs/2108.01139).
 
 ## Installation
 
@@ -93,6 +93,16 @@ This research was supported by the EC grant no. INEA/CEF/ICT/A2017/1565710 for t
 
 ## Credits
 
-Coming soon...
-
-
+Please consider citing the following [paper](https://arxiv.org/abs/2108.01139) as a thank you to the authors of the RONEC: 
+```
+Avram, Andrei-Marius, Pais, Vasile and Tufis, Dan. "PyEuroVoc: A Tool for Multilingual Legal Document Classification with EuroVoc Descriptors", arXiv preprint arXiv:2108.01139 (2021).
+```
+or in .bibtex format:
+```
+@article{avram2019pyeurovoc,
+  title={PyEuroVoc: A Tool for Multilingual Legal Document Classification with EuroVoc Descriptors},
+  author={Avram, Andrei-Marius, Pais, Vasile and Tufis, Dan},
+  journal={arXiv preprint arXiv:2108.01139},
+  year={2021}
+}
+```
