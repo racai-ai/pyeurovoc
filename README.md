@@ -95,13 +95,13 @@ This research was supported by the EC grant no. INEA/CEF/ICT/A2017/1565710 for t
 
 Please consider citing the following [paper](https://arxiv.org/abs/2108.01139) as a thank you to the authors of the RONEC: 
 ```
-Avram, Andrei-Marius, Pais, Vasile and Tufis, Dan. "PyEuroVoc: A Tool for Multilingual Legal Document Classification with EuroVoc Descriptors", arXiv preprint arXiv:2108.01139 (2021).
+Avram, Andrei-Marius, Vasile Pais, and Dan Tufis. "PyEuroVoc: A Tool for Multilingual Legal Document Classification with EuroVoc Descriptors." arXiv preprint arXiv:2108.01139 (2021).
 ```
 or in .bibtex format:
 ```
 @article{avram2021pyeurovoc,
   title={PyEuroVoc: A Tool for Multilingual Legal Document Classification with EuroVoc Descriptors},
-  author={Avram, Andrei-Marius, Pais, Vasile and Tufis, Dan},
+  author={Avram, Andrei-Marius and Pais, Vasile and Tufis, Dan},
   journal={arXiv preprint arXiv:2108.01139},
   year={2021}
 }
