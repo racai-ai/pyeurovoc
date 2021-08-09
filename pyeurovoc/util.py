@@ -1,9 +1,15 @@
 import requests
 import sys
+import os
 
 
 def download_file(url, save_path):
-    with open(save_path, 'wb') as f:
+    download_path = save_path + "_part"
+
+    if os.path.exists(download_path):
+        os.remove(download_path)
+
+    with open(download_path, 'wb') as f:
         response = requests.get(url, stream=True)
         total = response.headers.get('content-length')
 
@@ -23,3 +29,5 @@ def download_file(url, save_path):
                 ))
                 sys.stdout.flush()
     sys.stdout.write('\n\n')
+
+    os.rename(download_path, save_path)
