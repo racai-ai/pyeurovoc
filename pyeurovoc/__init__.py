@@ -1,8 +1,7 @@
 import os
 import torch
 import pickle
-import json
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, BertTokenizer
 from .util import download_file
 
 
@@ -77,7 +76,10 @@ class EuroVocBERT:
             self.mlb_encoder = pickle.load(pck_file)
 
         # load the tokenizer according to the model dictionary
-        self.tokenizer = AutoTokenizer.from_pretrained(DICT_MODELS[lang])
+        if "wikibert" in DICT_MODELS[lang]:
+            self.tokenizer = BertTokenizer.from_pretrained(DICT_MODELS[lang])
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(DICT_MODELS[lang])
 
     def __call__(self, document_text, num_labels=6):
         input_ids = self.tokenizer.encode(
