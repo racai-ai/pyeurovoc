@@ -3,6 +3,7 @@ import torch
 import pickle
 from transformers import AutoTokenizer, BertTokenizer
 from .util import download_file
+import re
 
 
 PYEUROVOC_PATH = os.path.join(os.path.expanduser("~"), ".cache", "pyeurovoc")
@@ -58,6 +59,7 @@ class EuroVocBERT:
 
         # load the model
         self.model = torch.load(os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt"))
+        self.model.eval()
 
         # load the multi-label encoder for eurovoc, y, download from repository if not found in .cache directory
         if not os.path.exists(os.path.join(PYEUROVOC_PATH, f"mlb_encoder_{lang}.pickle")):
@@ -82,6 +84,10 @@ class EuroVocBERT:
             self.tokenizer = AutoTokenizer.from_pretrained(DICT_MODELS[lang])
 
     def __call__(self, document_text, num_labels=6):
+        document_text = re.sub(r"<.*?>", "", document_text)
+        document_text = re.sub(r"\s+", " ", document_text)
+        document_text = document_text.strip()
+
         input_ids = self.tokenizer.encode(
             document_text,
             return_attention_mask=True,

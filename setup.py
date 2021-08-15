@@ -10,7 +10,7 @@ setup(
     # $ pip install sampleproject
     name='pyeurovoc',  # Required
 
-    version='1.0.3',  # Required
+    version='1.0.4',  # Required
 
     description='Python API for multilingual legal document classification with EuroVoc descriptors using BERT models.',  # Required
 
