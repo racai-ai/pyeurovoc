@@ -36,7 +36,17 @@ DICT_MODELS = {
 
 
 class EuroVocBERT:
-    def __init__(self, lang="en"):
+    def __init__(self, lang: str = "en", device: str = "cuda"):
+        """
+            Initialize the EuroVocBERT model.
+
+            Args:
+                lang (str): Language used as input for the model. Selects the corresponding BERT model.
+                    Defaults to "en".
+                device (str): Device to run the computation on. Defaults to "cuda".
+        """
+        self.device = torch.device(device)
+
         if lang not in DICT_MODELS.keys():
             raise ValueError("Language parameter must be one of the following languages: {}".format(DICT_MODELS.keys()))
 
@@ -58,7 +68,7 @@ class EuroVocBERT:
                   f"Loading...")
 
         # load the model
-        self.model = torch.load(os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt"))
+        self.model = torch.load(os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt"), map_location=self.device)
         self.model.eval()
 
         # load the multi-label encoder for eurovoc, y, download from repository if not found in .cache directory
@@ -84,33 +94,42 @@ class EuroVocBERT:
             self.tokenizer = AutoTokenizer.from_pretrained(DICT_MODELS[lang])
 
     def __call__(self, document_text, num_labels=6):
+        """
+            EuroVoc descriptors prediction method.
+
+            Args:
+                document_text (str): The input document text.
+                num_labels (int): Number of EuroVoc descriptors to return. Defaults to 6.
+            Returns:
+                A dictionary containing the first most probable "num_labels" together with their probabilities.
+        """
+        # clean the document text
         document_text = re.sub(r"<.*?>", "", document_text)
         document_text = re.sub(r"\s+", " ", document_text)
         document_text = document_text.strip()
 
+        # tokenize the document text
         input_ids = self.tokenizer.encode(
             document_text,
             return_attention_mask=True,
             truncation=True,
             max_length=512,
-            return_tensors="pt"
+            return_tensors="pt",
         ).reshape(1, -1)
 
+        # run the input tokens trough the model to obtain the logits
         with torch.no_grad():
             logits = self.model(
-                input_ids,
-                torch.ones_like(input_ids)
-            )[0]
+                input_ids.to(self.device),
+                torch.ones_like(input_ids).to(self.device)
+            )[0].detach().cpu()
 
-        probs = torch.sigmoid(logits).detach().cpu()
-
+        # obtain the probabilities and sort them descendingly
+        probs = torch.sigmoid(logits)
         probs_sorted, idx_sort = torch.sort(probs, descending=True)
 
-        outputs = torch.zeros_like(logits)
-        outputs[idx_sort[:num_labels]] = 1
-
+        # save the first 'num_labels' eurovoc ids and their probabilities
         result = {}
-
         for idx in idx_sort[:num_labels]:
             outputs = torch.zeros_like(logits)
             outputs[idx] = 1
