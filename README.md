@@ -26,7 +26,7 @@ prediction = model("Commission Decision on a modification of the system of aid a
 The prediction of the model is a dictionary that contains the predicted ID descriptors as keys together with their confidence score as values.
 
 ``` python
-{'155': 0.9995473027229309, '230': 0.9377984404563904, '889': 0.9193254113197327, '1519': 0.714003324508667, '5020': 0.5, '5541': 0.5}
+{'155': 0.9990228414535522, '365': 0.9199643731117249, '431': 0.8993396759033203, '889': 0.6949650645256042, '1519': 0.03358537331223488, '5541': 0.03317505866289139}
 ```
 
 The number of most probable labels returned by the model is controlled by the `num_labels` parameter (default is 6).
@@ -38,7 +38,7 @@ prediction = model("Commission Decision on a modification of the system of aid a
 
 Which outputs:
 ``` python
-{'155': 0.9995473027229309, '230': 0.9377984404563904, '889': 0.9193254113197327, '1519': 0.714003324508667}
+{'155': 0.9990228414535522, '365': 0.9199643731117249, '431': 0.8993396759033203, '889': 0.6949650645256042}
 ```
 
 ## Training your own models
