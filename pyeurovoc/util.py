@@ -4,6 +4,13 @@ import os
 
 
 def download_file(url, save_path):
+    """
+        Function used to download a file from a URL.
+
+        Args:
+            url (str): The URL to download from.
+            save_path (str): The saving path of the file.
+    """
     download_path = save_path + "_part"
 
     if os.path.exists(download_path):
