@@ -38,7 +38,7 @@ prediction = model("Commission Decision on a modification of the system of aid a
 
 Which outputs:
 ``` python
-{'155': 0.9990228414535522, '889': 0.9199643731117249, '1519': 0.8993396759033203, '5541': 0.6949650645256042}
+{'155': 0.9990228414535522, '365': 0.9199643731117249, '431': 0.8993396759033203, '889': 0.6949650645256042}
 ```
 
 ## Training your own models
