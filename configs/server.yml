@@ -3,10 +3,9 @@ server:
   port: 8080
 
 model:
-  model_path: "models/ro/model_0.pt"
-  language_model: "dumitrescustefan/bert-base-romanian-cased-v1"
+  language: "ro"
 
-mt_labels_path: "pyeurovoc/resources/mt_labels.json"
+mt_labels_path: "configs/mt_labels.json"
 num_id_labels: 6
 num_mt_labels: 5
 num_do_labels: 4

@@ -104,17 +104,18 @@ class EuroVocBERT:
 
         probs = torch.sigmoid(logits).detach().cpu()
 
-        probs_sorted, idx = torch.sort(probs, descending=True)
+        probs_sorted, idx_sort = torch.sort(probs, descending=True)
 
         outputs = torch.zeros_like(logits)
-        outputs[idx[:num_labels]] = 1
-
-        id_labels = self.mlb_encoder.inverse_transform(outputs.reshape(1, -1))[0]
-        id_probs = probs[idx[:num_labels]]
+        outputs[idx_sort[:num_labels]] = 1
 
         result = {}
 
-        for id_label, id_prob in zip(id_labels, id_probs):
-            result[str(id_label)] = float(id_prob)
+        for idx in idx_sort[:num_labels]:
+            outputs = torch.zeros_like(logits)
+            outputs[idx] = 1
+            id_label = self.mlb_encoder.inverse_transform(outputs.reshape(1, -1))[0][0]
+
+            result[str(id_label)] = float(probs[idx])
 
         return result

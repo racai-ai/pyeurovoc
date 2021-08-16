@@ -16,11 +16,11 @@ class MainTests(unittest.TestCase):
         with open(os.path.join("..", "configs", "models.yml"), "r") as yml_file:
             dict_models = yaml.load(yml_file)
 
-        for lang in dict_models:
-            print("-" * 100)
-            print(f"Testing for language: {lang}")
-            model = EuroVocBERT(lang)
-            outputs = model("This is a test text.")
+            for lang in dict_models:
+                print("-" * 100)
+                print(f"Testing for language: {lang}")
+                model = EuroVocBERT(lang)
+                outputs = model("This is a test text.")
 
             assert type(outputs) == dict and len(outputs) == 6
 

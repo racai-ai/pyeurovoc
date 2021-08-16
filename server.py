@@ -7,6 +7,7 @@ from transformers import AutoTokenizer
 import torch
 import traceback
 import json
+from pyeurovoc import EuroVocBERT
 
 app = Flask(__name__)
 
@@ -28,18 +29,13 @@ def predict():
             return Response(response='{"message": "The field \"data\" must be a byte array encoded in Base64."}',
                             status=400, mimetype='application/json')
 
-        input_ids = tokenizer.encode(content["data"], return_tensors="pt")
-        mask = torch.ones_like(input_ids)
+        id_labels = model(content["data"], num_labels=config["num_id_labels"])
 
-        with torch.no_grad():
-            output = model(input_ids, mask)[0]
-
-        id_labels = torch.sort(output, descending=True)[1].tolist()
         mt_labels = [dict_mt_labels[str(label)]for label in id_labels  if str(label) in dict_mt_labels]
         do_labels = [dict_mt_labels[str(label)][:2] for label in id_labels if str(label) in dict_mt_labels]
 
         return {
-            "id_labels": [str(label) for label in id_labels[:config["num_id_labels"]]],
+            "id_labels": list(id_labels.keys()),
             "mt_labels": mt_labels[:config["num_mt_labels"]],
             "do_labels": do_labels[:config["num_do_labels"]]
         }
@@ -52,7 +48,7 @@ def predict():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--server_config", type=str, default="pyeurovoc/configs/server.yml")
+    parser.add_argument("--server_config", type=str, default="configs/server.yml")
     args = parser.parse_args()
 
     with open(args.server_config, "r") as file:
@@ -67,9 +63,7 @@ if __name__ == "__main__":
 
     logging.info('Setting up server...')
 
-    tokenizer = AutoTokenizer.from_pretrained(config["model"]["language_model"])
-    model = torch.load(config["model"]["model_path"], map_location=device)
-    model.eval()
+    model = EuroVocBERT(lang=config["model"]["language"])
 
     logging.info('Server initialised')
 
