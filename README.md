@@ -1,6 +1,6 @@
 # **IMPORTANT NOTE!**
 
-This repository is not compatible yet with the latest version of the `transformers` library. You need to install a version < 4.11.0.
+This repository is not compatible yet with the latest version of the `transformers` library (related to [this issue](https://github.com/racai-ai/pyeurovoc/issues/2)). You need to install a version < 4.11.0.
 We recommend and tested with `transformers==4.10.3`.
 
 We are currently working to migrate the models to the latest version of `transformers`.
