@@ -1,3 +1,10 @@
+# **IMPORTANT NOTE!**
+
+This repository is not compatible yet with the latest version of the `transformers` library. You need to install a version < 4.11.0.
+We recommend and tested with `transformers==4.10.3`.
+
+We are currently working to migrate the models to the latest version of `transformers`.
+
 # EuroVoc-BERT
 
 PyEuroVoc is a tool for legal document classification with [EuroVoc](https://eur-lex.europa.eu/browse/eurovoc.html) descriptors. It supports 22 languages: Bulgarian (bg), Czech (cs), Danish (da), German (de), Greek (el), English (en), Spanish (es), Estonian (et), Finnish (fi), French (fr), Hungarian (hu), Italian (it), Lithuanian (lt), Latvian (lv), Maltese (mt), Dutch (nl), Polish (pl), Portuguese (pt), Romanian (ro), Slovak (sk), Slovenian (sl), Sweedish (sv). 
