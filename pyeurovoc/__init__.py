@@ -1,7 +1,7 @@
 import os
 import torch
 import pickle
-from transformers import AutoTokenizer, BertTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, BertTokenizer
 from .util import download_file
 import re
 
@@ -47,52 +47,28 @@ class EuroVocBERT:
         """
         self.device = torch.device(device)
 
-        if lang == "nl":
-            raise ValueError("Dutch language is no longer supported due to model's vocabulary modifications in the "
-                             "HuggingFace repository. This issue will be fixed in a future patch.")
-
         if lang not in DICT_MODELS.keys():
             raise ValueError("Language parameter must be one of the following languages: {}".format(DICT_MODELS.keys()))
 
         if not os.path.exists(PYEUROVOC_PATH):
             os.makedirs(PYEUROVOC_PATH)
 
-        model_dir = os.path.join(os.path.join(PYEUROVOC_PATH, f"model_{lang}"))
-        model_bin_path = os.path.join(os.path.join(PYEUROVOC_PATH, f"model_{lang}", "pytorch_model.bin"))
-        model_config_path = os.path.join(os.path.join(PYEUROVOC_PATH, f"model_{lang}", "config.json"))
-
-        if not os.path.exists(model_dir):
-            os.makedirs(model_dir)
-
-        # check config exists in local path
-        if not os.path.exists(model_config_path):
-            print(f"Configuration not found in the .cache directory '{model_dir}/'\n"
-                  f"Downloading from '{REPOSITORY_URL}'...")
-
-            download_file(
-                REPOSITORY_URL + f"model_{lang}/config.json",
-                model_config_path
-            )
-        # model already exists, loading from .cache directory
-        else:
-            print(f"Configuration found in the .cache directory '{model_config_path}'. Loading...")
-
         # model must be downloaded from the repostiory
-        if not os.path.exists(model_bin_path):
-            print(f"Model not found in the .cache directory '{model_dir}/'\n"
+        if not os.path.exists(os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt")):
+            print(f"Model 'model_{lang}.pt' not found in the .cache directory at '{PYEUROVOC_PATH}'\n"
                   f"Downloading from '{REPOSITORY_URL}'...")
 
             download_file(
-                REPOSITORY_URL + f"model_{lang}/pytorch_model.bin",
-                model_bin_path
+                REPOSITORY_URL + f"model_{lang}.pt",
+                os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt")
             )
         # model already exists, loading from .cache directory
         else:
-            print(f"Model found in the .cache directory '{model_bin_path}'. Loading...")
+            print(f"Model 'model_{lang}.pt' found in the .cache directory at '{PYEUROVOC_PATH}'. "
+                  f"Loading...")
 
         # load the model
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_dir)
-        self.model.to(self.device)
+        self.model = torch.load(os.path.join(PYEUROVOC_PATH, f"model_{lang}.pt"), map_location=self.device)
         self.model.eval()
 
         # load the multi-label encoder for eurovoc, y, download from repository if not found in .cache directory
@@ -146,7 +122,7 @@ class EuroVocBERT:
             logits = self.model(
                 input_ids.to(self.device),
                 torch.ones_like(input_ids).to(self.device)
-            )["logits"][0].detach().cpu()
+            )[0].detach().cpu()
 
         # obtain the probabilities and sort them descendingly
         probs = torch.sigmoid(logits)
