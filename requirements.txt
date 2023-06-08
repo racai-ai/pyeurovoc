@@ -1,5 +1,5 @@
 transformers==4.10.3
-sklearn
+scikit-learn
 scikit-multilearn
 pyyaml
 waitress
